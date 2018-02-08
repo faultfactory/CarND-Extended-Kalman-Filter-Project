@@ -11,21 +11,13 @@ class Tools {
 private:
 
   // Storage for prior Jacobian Matrix
-  Eigen::MatrixXd Hj_prev_;
+  
 
 public:
   /**
   * Constructor.
-  */
-  Tools(){
-    MatrixXd Hj_prev_; 
-    Hj_prev_ << 0,0,0,0,
-      0,0,0,0,
-      0,0,0,0,
-      0,0,0,0;
-  };
-  
-
+  */  
+ Eigen::MatrixXd Hj_prev_ = Eigen::MatrixXd::Zero(4,4);
   /**
   * Destructor.
   */

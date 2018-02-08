@@ -37,6 +37,7 @@ private:
 
   // previous timestamp
   long long previous_timestamp_;
+  long long delta_t_;
 
   // tool object used to compute Jacobian and RMSE
   Tools tools;

@@ -114,11 +114,21 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Update the process noise covariance matrix.
      * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
-  ekf_.F_<<
+  
+  
+  // Get new the delta t
+  double delta_t_ = (measurement_pack.timestamp_-previous_timestamp_)/1000000;
+
+  // Write new F Matrix using Identity from Eigen Library
+  ekf_.F_ = MatrixXd::Identity(4,4);
+  ekf_.F_(0,2) = delta_t_;
+  ekf_.F_(1,3) = delta_t_;
+  
+  //  Update the Process Noise Covariance Matrix, Q
 
 
-  ekf_.Predict();
 
+  ekf_.Predict() ;
   /*****************************************************************************
    *  Update
    ****************************************************************************/
