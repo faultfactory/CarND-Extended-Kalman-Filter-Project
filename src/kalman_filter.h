@@ -7,6 +7,8 @@ public:
 
   // state vector
   Eigen::VectorXd x_;
+  // Extra state vector for polar coordinate conversion
+  Eigen::VectorXd x_r_;
 
   // state covariance matrix
   Eigen::MatrixXd P_;
@@ -56,13 +58,12 @@ public:
    * Updates the state by using standard Kalman Filter equations
    * @param z The measurement at k+1
    */
-  void Update(const Eigen::VectorXd &z);
-
+  void Update(const Eigen::VectorXd &z,const Eigen::MatrixXd &H_laser_, const Eigen::MatrixXd &R_laser_);
   /**
    * Updates the state by using Extended Kalman Filter equations
    * @param z The measurement at k+1
    */
-  void UpdateEKF(const Eigen::VectorXd &z);
+  void UpdateEKF(const Eigen::VectorXd &z, const Eigen::MatrixXd &Hj_, const Eigen::MatrixXd &R_radar_);
 
 };
 

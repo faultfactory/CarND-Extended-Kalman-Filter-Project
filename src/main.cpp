@@ -32,7 +32,6 @@ int main()
 
   // Create a Kalman Filter instance
   FusionEKF fusionEKF;
-
   // used to compute the RMSE later
   Tools tools;
   vector<VectorXd> estimations;
@@ -104,7 +103,7 @@ int main()
     	  gt_values(2) = vx_gt;
     	  gt_values(3) = vy_gt;
     	  ground_truth.push_back(gt_values);
-          
+        
           //Call ProcessMeasurment(meas_package) for Kalman filter
     	  fusionEKF.ProcessMeasurement(meas_package);    	  
 
