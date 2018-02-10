@@ -72,10 +72,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     // create and initialize covariance matrix.     
     ekf_.P_ = MatrixXd(4, 4);
-	  ekf_.P_ <<1.0, 0, 0, 0,
-		          0, 1.0, 0, 0,
-			        0, 0, 10.0, 0,
-			        0, 0, 0, 10.0;
+	  ekf_.P_ <<100, 0, 0, 0,
+		          0, 100, 0, 0,
+			        0, 0, 100, 0,
+			        0, 0, 0, 100;
 
 
 
@@ -121,7 +121,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   
   
   // Get new the delta t
-  double delta_t_ = (measurement_pack.timestamp_-previous_timestamp_)/1000000;
+  float delta_t_ = (measurement_pack.timestamp_-previous_timestamp_)/1000000.0;
+  previous_timestamp_ = measurement_pack.timestamp_;
   
   // Write new F Matrix using Identity from Eigen Library
   ekf_.F_ = MatrixXd::Identity(4,4);
@@ -137,10 +138,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
 	//set the process covariance matrix Q
 	ekf_.Q_ = MatrixXd(4, 4);
-	ekf_.Q_ <<  dt_4/4*noise_ax_, 0, dt_3/2*noise_ax_, 0,
-			   0, dt_4/4*noise_ay_, 0, dt_3/2*noise_ay_,
-			   dt_3/2*noise_ax_, 0, dt_2*noise_ax_, 0,
-			   0, dt_3/2*noise_ay_, 0, dt_2*noise_ay_;
+	ekf_.Q_ <<  noise_ax_*dt_4/4, 0, noise_ax_*dt_3/2, 0,
+			   0, noise_ay_*dt_4/4, 0, noise_ay_*dt_3/2,
+			   noise_ax_*dt_3/2, 0, dt_2*noise_ax_, 0,
+			   0, noise_ay_*dt_3/2, 0, dt_2*noise_ay_;
 
   ekf_.Predict() ;
   /*****************************************************************************
@@ -156,17 +157,15 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // Radar updates   
     Hj_ = tools_.CalculateJacobian(ekf_.x_);
-    ekf_.UpdateEKF(measurement_pack.raw_measurements_,Hj_,R_radar_);
-    
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_,Hj_,R_radar_); 
   } else {
     // Laser updates
     H_laser_<<  1,0,0,0,
                 0,1,0,0;
     ekf_.Update(measurement_pack.raw_measurements_,H_laser_,R_laser_);
-
   }
 
   // print the output
-  cout << "x_ = " << ekf_.x_ << endl;
-  cout << "P_ = " << ekf_.P_ << endl;
+  //cout << "x_ = " << ekf_.x_ << endl;
+  //cout << "P_ = " << ekf_.P_ << endl;
 }
