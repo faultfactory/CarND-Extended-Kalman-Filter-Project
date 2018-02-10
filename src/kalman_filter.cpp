@@ -48,11 +48,12 @@ void KalmanFilter::Update(const VectorXd &z,const MatrixXd &H_laser_, const Matr
   TODO:
     * update the state by using Kalman Filter equations
   */
+
   cout<<endl<<"Laser Update"<<endl;
-  VectorXd z_pred = H_ * x_;
+  VectorXd z_pred = H_laser_ * x_;
 	VectorXd y = z - z_pred;
-	MatrixXd Ht = H_.transpose();
-	MatrixXd S = H_ * P_ * Ht + R_;
+	MatrixXd Ht = H_laser_.transpose();
+	MatrixXd S = H_laser_ * P_ * Ht + R_laser_;
 	MatrixXd Si = S.inverse();
 	MatrixXd PHt = P_ * Ht;
 	MatrixXd K = PHt * Si;
@@ -60,7 +61,7 @@ void KalmanFilter::Update(const VectorXd &z,const MatrixXd &H_laser_, const Matr
   x_ = x_ + (K * y);
 	long x_size = x_.size();
 	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H_) * P_;
+	P_ = (I - K * H_laser_) * P_;
 
 }
 
@@ -74,25 +75,36 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const MatrixXd &Hj_, const Matri
   
   x_r_ = VectorXd(3);
   x_r_(0) = sqrt(pow(x_(0),2)+pow(x_(1),2));  
-  x_r_(1) = atan(x_(0)/x_(1));
-  x_r_(2) = (x_(0)*x_(2)+x_(1)*x_(3))/sqrt(pow(x_(0),2)+pow(x_(1),2));
+  if(x_r_(0)<0000.1){
+    return;
+  };
   
-  cout<<endl<<"x_r_ written"<<endl;
+  x_r_(1) = atan2(x_(1),x_(0));
+  x_r_(2) = (x_(0)*x_(2)+x_(1)*x_(3))/x_r_(0);
   
-  VectorXd z_pred = H_ * x_r_;
+  //cout<<endl<<"x_r_"<<endl<<x_r_<<endl;
+  //cout<<endl<<"Hj_"<<endl<<Hj_<<endl;
+  //cout<<endl<<"z"<<endl<<z<<endl;
+
+  VectorXd z_pred = x_r_;
 	VectorXd y = z - z_pred;
 
-  cout<<endl<<"error computed"<<endl;
-	MatrixXd Ht = H_.transpose();
-	MatrixXd S = H_ * P_ * Ht + R_;
+	MatrixXd Ht = Hj_.transpose();  
+	MatrixXd S = Hj_ * P_ * Ht + R_radar_;
 	MatrixXd Si = S.inverse();
 	MatrixXd PHt = P_ * Ht;
 	MatrixXd K = PHt * Si;
   
-  cout<<endl<<"state update"<<endl;
+
+  //cout<<endl<<"y"<<endl<<y<<endl;
+  //cout<<endl<<"K"<<endl<<K<<endl;
 
   x_ = x_ + (K * y);
+  //cout<<endl<<"state update completed"<<endl;
 	long x_size = x_.size();
 	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H_) * P_;
+	P_ = (I - K * Hj_) * P_;
+  
+  //cout<<endl<<"noise update completed"<<endl;
+
 }
