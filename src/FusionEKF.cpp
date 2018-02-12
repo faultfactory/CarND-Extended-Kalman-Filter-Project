@@ -31,6 +31,11 @@ FusionEKF::FusionEKF() {
         0, 0.0009, 0,
         0, 0, 0.09;
 
+
+  // Laser measurement matrix
+  H_laser_<<  1,0,0,0,
+               0,1,0,0;
+
   /**
   TODO:
     * Finish initializing the FusionEKF.
@@ -61,12 +66,13 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1.0, 1.0, 1.0, 1.0;
 
-    // create and initialize covariance matrix.     
+    // create and initialize covariance matrix.
+    // After trial and error, I decided to put this matrix in the order of magnitude that it evolved to. 
     ekf_.P_ = MatrixXd(4, 4);
-	  ekf_.P_ <<1, 0, 0, 0,
-		          0, 1, 0, 0,
-			        0, 0, 1, 0,
-			        0, 0, 0, 1;
+	  ekf_.P_ <<0.1, 0.1, 0.1, 0.1,
+		          0.1, 0.1, 0.1, 0.1,
+			        0.1, 0.1, 0.1, 0.1,
+			        0.1, 0.1, 0.1, 0.1;
 
 
 
@@ -77,8 +83,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       VectorXd meas = measurement_pack.raw_measurements_;
       float rho_=meas(0);
       float phi_=meas(1);
-      ekf_.x_(0) = rho_*sin(phi_);
-      ekf_.x_(1) = rho_*cos(phi_);
+      ekf_.x_(0) = rho_*cos(phi_);
+      ekf_.x_(1) = rho_*sin(phi_);
       ekf_.x_(2) = 0;
       ekf_.x_(3) = 0;
     }
@@ -151,8 +157,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.UpdateEKF(measurement_pack.raw_measurements_,Hj_,R_radar_); 
   } else {
     // Laser updates
-    H_laser_<<  1,0,0,0,
-                0,1,0,0;
+   
     ekf_.Update(measurement_pack.raw_measurements_,H_laser_,R_laser_);
   }
 

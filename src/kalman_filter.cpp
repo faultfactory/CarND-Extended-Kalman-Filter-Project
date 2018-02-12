@@ -74,10 +74,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const MatrixXd &Hj_, const Matri
   x_r_(1) = (px != 0 ? atan2(py,px) : M_PI/2.0);
   x_r_(2) = (x_r_(0) != 0 ? ((px*vx)+(py*vy))/x_r_(0) : 0);
   
-
-
-  VectorXd z_pred = x_r_;     
-	VectorXd y = z - z_pred;
+	VectorXd y = z - x_r_;
 
   if(fabs(y(1))>M_PI){
     cout<<endl<<"AngleLimExceeded!!!"<<endl;
@@ -101,5 +98,4 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const MatrixXd &Hj_, const Matri
 	MatrixXd I = MatrixXd::Identity(x_size, x_size);
 	P_ = (I - K * Hj_) * P_;
   
-
 }
