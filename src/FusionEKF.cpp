@@ -36,15 +36,6 @@ FusionEKF::FusionEKF() {
     * Finish initializing the FusionEKF.
     * Set the process and measurement noises
   */
-  //Process Noise
-  nu_ = VectorXd(4);
-  nu_ << 0,0,0,0;
-
-  //Meas Noise
-  omega_r_ = VectorXd(3);
-  omega_r_ << 0,0,0;
-  omega_l_ = VectorXd(2);
-  omega_l_ << 0,0;
 }
 
 /**
@@ -72,10 +63,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     // create and initialize covariance matrix.     
     ekf_.P_ = MatrixXd(4, 4);
-	  ekf_.P_ <<100, 0, 0, 0,
-		          0, 100, 0, 0,
-			        0, 0, 100, 0,
-			        0, 0, 0, 100;
+	  ekf_.P_ <<1, 0, 0, 0,
+		          0, 1, 0, 0,
+			        0, 0, 1, 0,
+			        0, 0, 0, 1;
 
 
 
@@ -166,6 +157,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   }
 
   // print the output
-  //cout << "x_ = " << ekf_.x_ << endl;
-  //cout << "P_ = " << ekf_.P_ << endl;
+  cout << "x_ = " << ekf_.x_ << endl;
+  cout << "P_ = " << ekf_.P_ << endl;
 }
