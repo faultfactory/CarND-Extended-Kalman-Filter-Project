@@ -26,31 +26,22 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
 void KalmanFilter::Predict() {
   /**
   TODO:
-    * predict the state
+    * predict the state - COMPLETE
   */
-  
-  //cout<<endl<<"Prediction Started"<<endl;
-  //cout<<endl<<"F"<<endl<<F_<<endl<<"x"<<endl<<x_<<endl;
+
   
   x_ = F_ * x_;
-	//cout<<endl<<"Prediction step complete";
-  
   MatrixXd Ft = F_.transpose();
-  //cout<<endl<<"Ft written"<<endl;
-  //cout<<endl<<"P"<<endl<<P_<<endl<<"Q_"<<endl<<Q_<<endl;
-
-	P_ = F_ * P_ * Ft + Q_;
-
-  //cout<<endl<<"Process Noise Completed"<<endl;
+  P_ = F_ * P_ * Ft + Q_;
 }
 
 void KalmanFilter::Update(const VectorXd &z,const MatrixXd &H_laser_, const MatrixXd &R_laser_) {
   /**
   TODO:
-    * update the state by using Kalman Filter equations
+    * update the state by using Kalman Filter equations - COMPLETE
   */
 
-  cout<<endl<<"Laser Update"<<endl;
+  //cout<<endl<<"Laser Update"<<endl;
   VectorXd z_pred = H_laser_ * x_;
 	VectorXd y = z - z_pred;
 	MatrixXd Ht = H_laser_.transpose();
@@ -71,7 +62,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const MatrixXd &Hj_, const Matri
   TODO:
     * update the state by using Extended Kalman Filter equations
   */
-  cout<<endl<<"Radar Update"<<endl;
+  //cout<<endl<<"Radar Update"<<endl;
   // convert predicted state to polar coords
   float px = x_(0);
 	float py = x_(1);
@@ -83,11 +74,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const MatrixXd &Hj_, const Matri
   x_r_(1) = (px != 0 ? atan2(py,px) : M_PI/2.0);
   x_r_(2) = (x_r_(0) != 0 ? ((px*vx)+(py*vy))/x_r_(0) : 0);
   
-  //cout<<endl<<"x_r_"<<endl<<x_r_<<endl;
-  //cout<<endl<<"Hj_"<<endl<<Hj_<<endl;
-  //cout<<endl<<"z"<<endl<<z<<endl;
-  
-  //cout<<endl<<"Angle Measurement:  "<< z(1)<<"  Angle Predict  " <<x_r_(1)<<endl;
+
 
   VectorXd z_pred = x_r_;     
 	VectorXd y = z - z_pred;
@@ -106,17 +93,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z, const MatrixXd &Hj_, const Matri
 	MatrixXd Si = S.inverse();
 	MatrixXd PHt = P_ * Ht;
 	MatrixXd K = PHt * Si;
-  
-
-  //cout<<endl<<"y"<<endl<<y<<endl;
-  //cout<<endl<<"K"<<endl<<K<<endl;
-
+ 
   x_ = x_ + (K * y);
-  //cout<<endl<<"state update completed"<<endl;
+ 
+
 	long x_size = x_.size();
 	MatrixXd I = MatrixXd::Identity(x_size, x_size);
 	P_ = (I - K * Hj_) * P_;
   
-  //cout<<endl<<"noise update completed"<<endl;
 
 }
